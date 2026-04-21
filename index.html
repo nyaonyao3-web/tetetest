@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黒猫の癒し処 - Black Cat Healing</title>
+    <!-- 
+        GitHub Pagesで動く理由:
+        1. 全ての処理がクライアントサイド（ブラウザ内）のJSで完結している
+        2. 外部サーバーやDBを必要とせず、静的ファイルとして配信可能
+        3. 相対パスや外部CDN（Tailwind, Lucide）のみを使用している
+    -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        .cat-eye {
+            transition: height 0.1s ease-in-out;
+        }
+
+        .purr-animation {
+            animation: purr 2s infinite ease-in-out;
+        }
+
+        @keyframes purr {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+
+        .float {
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .healing-gradient {
+            background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+        }
+
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="selection:bg-yellow-500 selection:text-black">
+
+    <!-- ナビゲーション -->
+    <nav class="fixed top-0 w-full z-50 bg-black/50 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 font-bold text-xl tracking-wider">
+                <i data-lucide="cat" class="text-yellow-500"></i>
+                <span>KURONEKO</span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm">
+                <a href="#home" class="hover:text-yellow-500 transition">ホーム</a>
+                <a href="#interact" class="hover:text-yellow-500 transition">ふれあい</a>
+                <a href="#wisdom" class="hover:text-yellow-500 transition">黒猫の知恵</a>
+                <a href="#diary" class="hover:text-yellow-500 transition">癒し日記</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ヒーローセクション -->
+    <section id="home" class="min-h-screen flex flex-col items-center justify-center pt-20 px-6 text-center">
+        <div class="relative w-64 h-64 mb-8 float">
+            <!-- 黒猫のSVG -->
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full fill-current text-black filter drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                <path d="M100 30 C 70 30, 40 50, 40 90 C 40 130, 60 160, 100 160 C 140 160, 160 130, 160 90 C 160 50, 130 30, 100 30" />
+                <path d="M45 45 L 30 10 L 70 35 Z" /> <!-- 左耳 -->
+                <path d="M155 45 L 170 10 L 130 35 Z" /> <!-- 右耳 -->
+                <!-- 目 -->
+                <circle cx="75" cy="85" r="12" fill="#eab308" />
+                <rect id="left-pupil" x="73" y="78" width="4" height="14" rx="2" fill="black" class="cat-eye" />
+                <circle cx="125" cy="85" r="12" fill="#eab308" />
+                <rect id="right-pupil" x="123" y="78" width="4" height="14" rx="2" fill="black" class="cat-eye" />
+                <!-- 鼻 -->
+                <path d="M95 105 L 105 105 L 100 110 Z" fill="#ff9999" />
+            </svg>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">静かな夜と、黒猫の癒し。</h1>
+        <p class="text-gray-400 max-w-lg mx-auto leading-relaxed">
+            ここは、忙しい日常を少しだけ忘れるための場所。黒猫を撫でたり、一息ついたりしていきませんか？
+        </p>
+    </section>
+
+    <!-- ふれあいセクション -->
+    <section id="interact" class="py-24 bg-zinc-900/50">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-12 flex items-center justify-center gap-3">
+                <i data-lucide="hand"></i> 黒猫を撫でる
+            </h2>
+            <div class="inline-block p-12 bg-black rounded-3xl border border-white/5 shadow-2xl transition-all hover:border-yellow-500/30 group cursor-pointer" id="pet-area">
+                <div id="purr-box" class="mb-6 opacity-0 transition-opacity duration-500">
+                    <span class="bg-yellow-500/10 text-yellow-500 px-4 py-2 rounded-full text-sm font-bold purr-animation block w-fit mx-auto">
+                        ゴロゴロゴロ...
+                    </span>
+                </div>
+                <div class="relative inline-block">
+                    <i data-lucide="cat" id="cat-main" class="w-32 h-32 text-gray-800 transition-transform duration-300 group-active:scale-95"></i>
+                </div>
+                <p class="mt-8 text-sm text-gray-500">クリック（タップ）して撫でてみてください</p>
+                <div class="mt-4 flex justify-center gap-1" id="love-meter">
+                    <!-- ハートがここに追加される -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 知恵セクション -->
+    <section id="wisdom" class="py-24">
+        <div class="max-w-3xl mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-8">黒猫からのメッセージ</h2>
+            <div id="wisdom-card" class="min-h-[200px] p-10 healing-gradient rounded-2xl border border-white/10 flex flex-col items-center justify-center shadow-inner">
+                <p id="wisdom-text" class="text-xl md:text-2xl leading-relaxed mb-6 italic">「たまには、何もしない時間も大切だよ」</p>
+                <button onclick="generateWisdom()" class="flex items-center gap-2 bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-yellow-500 transition-colors">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    別の言葉をもらう
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 癒し日記 (LocalStorage) -->
+    <section id="diary" class="py-24 bg-zinc-900/50">
+        <div class="max-w-3xl mx-auto px-6">
+            <h2 class="text-3xl font-bold mb-4 text-center">あなたの癒し日記</h2>
+            <p class="text-center text-gray-400 mb-10 text-sm">今日あった小さな幸せをここに。ブラウザに保存されます。</p>
+            
+            <div class="bg-black p-6 rounded-2xl border border-white/10 shadow-xl mb-8">
+                <textarea id="diary-input" placeholder="今日はどんな日でしたか？" class="w-full bg-zinc-900 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-yellow-500/50 h-32 transition-all"></textarea>
+                <button onclick="saveEntry()" class="w-full mt-4 bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-yellow-900/20">
+                    記録する
+                </button>
+            </div>
+
+            <div id="diary-list" class="space-y-4">
+                <!-- 履歴がここに表示される -->
+            </div>
+        </div>
+    </section>
+
+    <!-- フッター -->
+    <footer class="py-12 border-t border-white/5 text-center text-gray-600 text-sm">
+        <p>&copy; 2024 黒猫の癒し処. すべての黒猫に愛を。</p>
+    </footer>
+
+    <script>
+        // Lucideアイコンの初期化
+        lucide.createIcons();
+
+        // 黒猫の知恵
+        const wisdomList = [
+            "「たまには、何もしない時間も大切だよ」",
+            "「君のままでいいんだよ。猫は誰の真似もしないでしょ？」",
+            "「暗闇は怖いものじゃない。自分を見つめる時間だよ」",
+            "「伸びをして。深く息を吸って。それだけで十分」",
+            "「幸運は、ふとした瞬間に足元を通り過ぎるものさ」",
+            "「疲れたら寝ちゃおう。明日のことは明日考えればいい」",
+            "「君が笑うと、世界が少しだけ明るくなる気がするよ」",
+            "「雨音を楽しむ心の余裕を。傘はあるかい？」"
+        ];
+
+        function generateWisdom() {
+            const textElement = document.getElementById('wisdom-text');
+            textElement.style.opacity = '0';
+            setTimeout(() => {
+                const random = Math.floor(Math.random() * wisdomList.length);
+                textElement.innerText = wisdomList[random];
+                textElement.style.opacity = '1';
+            }, 300);
+        }
+
+        // ふれあい機能
+        let petCount = 0;
+        const petArea = document.getElementById('pet-area');
+        const purrBox = document.getElementById('purr-box');
+        const catMain = document.getElementById('cat-main');
+        const loveMeter = document.getElementById('love-meter');
+        const leftPupil = document.getElementById('left-pupil');
+        const rightPupil = document.getElementById('right-pupil');
+
+        petArea.addEventListener('mousedown', () => {
+            petCount++;
+            purrBox.style.opacity = '1';
+            catMain.classList.add('text-yellow-500');
+            
+            // 瞳を細める演出
+            leftPupil.setAttribute('height', '2');
+            rightPupil.setAttribute('height', '2');
+            leftPupil.setAttribute('y', '84');
+            rightPupil.setAttribute('y', '84');
+
+            // ハート追加
+            if (petCount % 3 === 0) {
+                const heart = document.createElement('i');
+                heart.setAttribute('data-lucide', 'heart');
+                heart.className = 'w-4 h-4 text-red-500 animate-bounce';
+                loveMeter.appendChild(heart);
+                lucide.createIcons();
+            }
+        });
+
+        petArea.addEventListener('mouseup', () => {
+            setTimeout(() => {
+                purrBox.style.opacity = '0';
+                catMain.classList.remove('text-yellow-500');
+                leftPupil.setAttribute('height', '14');
+                rightPupil.setAttribute('height', '14');
+                leftPupil.setAttribute('y', '78');
+                rightPupil.setAttribute('y', '78');
+            }, 500);
+        });
+
+        // 日記機能 (LocalStorage)
+        function saveEntry() {
+            const input = document.getElementById('diary-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const entries = JSON.parse(localStorage.getItem('cat_diary') || '[]');
+            const newEntry = {
+                id: Date.now(),
+                text: text,
+                date: new Date().toLocaleString()
+            };
+            entries.unshift(newEntry);
+            localStorage.setItem('cat_diary', JSON.stringify(entries));
+            input.value = '';
+            renderDiary();
+        }
+
+        function deleteEntry(id) {
+            const entries = JSON.parse(localStorage.getItem('cat_diary') || '[]');
+            const filtered = entries.filter(e => e.id !== id);
+            localStorage.setItem('cat_diary', JSON.stringify(filtered));
+            renderDiary();
+        }
+
+        function renderDiary() {
+            const list = document.getElementById('diary-list');
+            const entries = JSON.parse(localStorage.getItem('cat_diary') || '[]');
+            
+            list.innerHTML = entries.map(entry => `
+                <div class="bg-zinc-900 p-6 rounded-xl border border-white/5 shadow-md flex justify-between items-start group animate-in fade-in duration-500">
+                    <div>
+                        <p class="text-xs text-yellow-600 mb-2 font-mono">${entry.date}</p>
+                        <p class="text-gray-300 leading-relaxed">${entry.text}</p>
+                    </div>
+                    <button onclick="deleteEntry(${entry.id})" class="text-gray-600 hover:text-red-500 transition opacity-0 group-hover:opacity-100 p-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `).join('');
+            
+            if (entries.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-600 py-10">まだ日記はありません</p>';
+            }
+            lucide.createIcons();
+        }
+
+        // 初期描画
+        window.onload = () => {
+            renderDiary();
+        };
+
+        // スムーススクロール
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
